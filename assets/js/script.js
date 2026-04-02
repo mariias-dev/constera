@@ -160,7 +160,16 @@ const translations = {
     "contact.error.emailRequired": "Please enter your email address.",
     "contact.error.emailInvalid": "Please enter a valid email address.",
     "contact.error.messageRequired": "Please enter your inquiry.",
-    "contact.error.messageShort": "Inquiry must contain at least 10 characters."
+    "contact.error.messageShort": "Inquiry must contain at least 10 characters.",
+    "footer.description": "International industrial group focused on infrastructure, energy systems and advanced manufacturing partnerships.",
+    "footer.navigation": "Navigation",
+    "footer.contact": "Contact",
+    "footer.legal": "Information",
+    "footer.address": "One Horizon Square, Level 28",
+    "footer.rights": "All rights reserved.",
+    "footer.note": "Corporate website concept for presentation purposes.",
+    "footer.copyright": "© 2026 CONSTERA Industrial Group",
+    "footer.backToTop": "Back to top"
   },
   ru: {
     "meta.title": "CONSTERA Industrial Group",
@@ -311,7 +320,16 @@ const translations = {
     "contact.error.emailRequired": "Пожалуйста, укажите email.",
     "contact.error.emailInvalid": "Пожалуйста, укажите корректный email.",
     "contact.error.messageRequired": "Пожалуйста, укажите текст запроса.",
-    "contact.error.messageShort": "Текст запроса должен содержать не менее 10 символов."
+    "contact.error.messageShort": "Текст запроса должен содержать не менее 10 символов.",
+    "footer.description": "Международная промышленная группа с фокусом на инфраструктуру, энергетические системы и партнерства в сфере передового производства.",
+    "footer.navigation": "Навигация",
+    "footer.contact": "Контакты",
+    "footer.legal": "Информация",
+    "footer.address": "One Horizon Square, уровень 28",
+    "footer.rights": "Все права защищены.",
+    "footer.note": "Корпоративная концепция сайта для презентационных целей.",
+    "footer.copyright": "© 2026 CONSTERA Industrial Group",
+    "footer.backToTop": "Наверх"
   }
 };
 
