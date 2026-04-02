@@ -853,6 +853,26 @@ dd {
   gap: 16px;
 }
 
+.form-status {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.form-status.is-success {
+  color: #dff7ef;
+  border-color: rgba(15, 143, 111, 0.35);
+  background: rgba(15, 143, 111, 0.12);
+}
+
+.form-status.is-error {
+  color: #ffe3e0;
+  border-color: rgba(212, 74, 74, 0.35);
+  background: rgba(212, 74, 74, 0.12);
+}
+
 .contact-form label {
   display: grid;
   gap: 8px;
@@ -1059,5 +1079,24 @@ dd {
 
   .card-media {
     height: 190px;
+  }
+
+  .partners-marquee {
+    padding: 16px;
+    overflow: visible;
+  }
+
+  .partners-track {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-inline: 0;
+  }
+
+  .partners-track span {
+    width: 100%;
+    text-align: center;
+    white-space: normal;
   }
 }

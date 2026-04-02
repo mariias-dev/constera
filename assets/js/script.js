@@ -3,6 +3,8 @@ const nav = document.querySelector(".nav");
 const counters = document.querySelectorAll(".counter");
 const form = document.querySelector(".contact-form");
 const langButtons = document.querySelectorAll(".lang-button");
+const langInput = form?.querySelector('input[name="lang"]');
+const formStatus = form?.querySelector(".form-status");
 
 const translations = {
   en: {
@@ -145,7 +147,8 @@ const translations = {
     "contact.inquiry": "Inquiry",
     "contact.inquiryPlaceholder": "Describe your partnership, investment or project inquiry",
     "contact.submit": "Send Inquiry",
-    "contact.success": "Inquiry Received"
+    "contact.success": "Inquiry sent successfully.",
+    "contact.error": "Failed to send inquiry. Please try again later."
   },
   ru: {
     "meta.title": "CONSTERA Industrial Group",
@@ -287,7 +290,8 @@ const translations = {
     "contact.inquiry": "Запрос",
     "contact.inquiryPlaceholder": "Опишите ваш партнерский, инвестиционный или проектный запрос",
     "contact.submit": "Отправить запрос",
-    "contact.success": "Запрос отправлен"
+    "contact.success": "Запрос успешно отправлен.",
+    "contact.error": "Не удалось отправить запрос. Попробуйте позже."
   }
 };
 
@@ -315,9 +319,20 @@ const applyTranslations = (lang) => {
     element.setAttribute("content", dictionary[key]);
   });
 
+  if (formStatus && !formStatus.hidden && formStatus.dataset.status) {
+    const statusKey = `contact.${formStatus.dataset.status}`;
+    if (dictionary[statusKey]) {
+      formStatus.textContent = dictionary[statusKey];
+    }
+  }
+
   langButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.lang === lang);
   });
+
+  if (langInput) {
+    langInput.value = lang;
+  }
 };
 
 const animateCounter = (entry) => {
@@ -388,19 +403,27 @@ langButtons.forEach((button) => {
 
 applyTranslations(currentLanguage);
 
+const params = new URLSearchParams(window.location.search);
+const status = params.get("status");
+const statusLang = params.get("lang");
+
+if (statusLang && translations[statusLang]) {
+  currentLanguage = statusLang;
+  localStorage.setItem("constera-language", currentLanguage);
+  applyTranslations(currentLanguage);
+}
+
+if (formStatus && (status === "success" || status === "error")) {
+  formStatus.hidden = false;
+  formStatus.dataset.status = status;
+  formStatus.classList.add(status === "success" ? "is-success" : "is-error");
+  formStatus.textContent = translations[currentLanguage][`contact.${status}`];
+}
+
 if (form) {
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const button = form.querySelector("button");
-    if (!button) return;
-    const original = translations[currentLanguage]["contact.submit"];
-    const success = translations[currentLanguage]["contact.success"];
-    button.textContent = success;
-    button.disabled = true;
-    setTimeout(() => {
-      button.textContent = original;
-      button.disabled = false;
-      form.reset();
-    }, 1800);
+  form.addEventListener("submit", () => {
+    if (langInput) {
+      langInput.value = currentLanguage;
+    }
   });
 }

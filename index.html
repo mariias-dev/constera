@@ -405,7 +405,16 @@
               <p>partners@constera-group.com</p>
               <p>+1 (800) 410-2040</p>
             </div>
-            <form class="contact-form glass" data-aos="fade-up" data-aos-duration="1100" data-aos-delay="90">
+            <form
+              class="contact-form glass"
+              action="send.php"
+              method="post"
+              data-aos="fade-up"
+              data-aos-duration="1100"
+              data-aos-delay="90"
+            >
+              <input type="hidden" name="lang" value="en" />
+              <div class="form-status" hidden aria-live="polite"></div>
               <label>
                 <span data-i18n="contact.name">Name</span>
                 <input type="text" name="name" placeholder="Your full name" data-i18n-placeholder="contact.namePlaceholder" />
@@ -416,7 +425,7 @@
               </label>
               <label>
                 <span data-i18n="contact.email">Email</span>
-                <input type="email" name="email" placeholder="name@company.com" />
+                <input type="email" name="email" placeholder="name@company.com" required />
               </label>
               <label>
                 <span data-i18n="contact.inquiry">Inquiry</span>
@@ -425,6 +434,7 @@
                   rows="5"
                   placeholder="Describe your partnership, investment or project inquiry"
                   data-i18n-placeholder="contact.inquiryPlaceholder"
+                  required
                 ></textarea>
               </label>
               <button class="button button-primary" type="submit" data-i18n="contact.submit">Send Inquiry</button>
