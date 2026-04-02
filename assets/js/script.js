@@ -12,8 +12,8 @@ const pageTransition = document.querySelector(".page-transition");
 
 const translations = {
   en: {
-    "meta.title": "CONSTERA Industrial Group",
-    "meta.description": "Premium corporate website concept for CONSTERA Industrial Group.",
+    "meta.title": "CONSTERA Industrial Group | Industrial Infrastructure, Energy and Manufacturing",
+    "meta.description": "CONSTERA Industrial Group is an international industrial group focused on infrastructure, energy systems, advanced manufacturing and strategic partnerships.",
     "brand.subtitle": "Industrial Group",
     "nav.home": "Home",
     "nav.about": "About",
@@ -172,8 +172,8 @@ const translations = {
     "footer.backToTop": "Back to top"
   },
   ru: {
-    "meta.title": "CONSTERA Industrial Group",
-    "meta.description": "Премиальная концепция корпоративного сайта CONSTERA Industrial Group.",
+    "meta.title": "CONSTERA Industrial Group | Промышленная инфраструктура, энергетика и производство",
+    "meta.description": "CONSTERA Industrial Group — международная промышленная группа с фокусом на инфраструктуру, энергетические системы, advanced manufacturing и стратегические партнерства.",
     "brand.subtitle": "Индастриал Груп",
     "nav.home": "Главная",
     "nav.about": "О компании",
@@ -339,6 +339,7 @@ let languageTransitionTimers = [];
 const applyTranslations = (lang) => {
   const dictionary = translations[lang] || translations.en;
   document.documentElement.lang = lang;
+  document.title = dictionary["meta.title"] || "CONSTERA Industrial Group";
 
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const key = element.dataset.i18n;
@@ -357,6 +358,16 @@ const applyTranslations = (lang) => {
     if (!dictionary[key]) return;
     element.setAttribute("content", dictionary[key]);
   });
+
+  const ogTitle = document.querySelector('meta[property="og:title"]');
+  const ogDescription = document.querySelector('meta[property="og:description"]');
+  const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+  const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+
+  if (ogTitle) ogTitle.setAttribute("content", dictionary["meta.title"] || "CONSTERA Industrial Group");
+  if (ogDescription) ogDescription.setAttribute("content", dictionary["meta.description"] || "");
+  if (twitterTitle) twitterTitle.setAttribute("content", dictionary["meta.title"] || "CONSTERA Industrial Group");
+  if (twitterDescription) twitterDescription.setAttribute("content", dictionary["meta.description"] || "");
 
   if (formStatus && !formStatus.hidden && formStatus.dataset.status) {
     const statusKey = formStatus.dataset.status === "validation"
