@@ -15,8 +15,15 @@ $company = trim((string)($_POST['company'] ?? ''));
 $email = trim((string)($_POST['email'] ?? ''));
 $message = trim((string)($_POST['message'] ?? ''));
 
-if ($email === '' || $message === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    header('Location: ' . $redirectBase . '?status=error&lang=' . $lang . '#contact');
+$hasErrors =
+    mb_strlen($name) < 2 ||
+    ($company !== '' && mb_strlen($company) < 2) ||
+    $email === '' ||
+    !filter_var($email, FILTER_VALIDATE_EMAIL) ||
+    mb_strlen($message) < 10;
+
+if ($hasErrors) {
+    header('Location: ' . $redirectBase . '?status=validation&lang=' . $lang . '#contact');
     exit;
 }
 

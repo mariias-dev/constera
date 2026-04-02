@@ -5,6 +5,10 @@ const form = document.querySelector(".contact-form");
 const langButtons = document.querySelectorAll(".lang-button");
 const langInput = form?.querySelector('input[name="lang"]');
 const formStatus = form?.querySelector(".form-status");
+const formFields = form
+  ? Array.from(form.querySelectorAll('input[name]:not([type="hidden"]), textarea[name]'))
+  : [];
+const pageTransition = document.querySelector(".page-transition");
 
 const translations = {
   en: {
@@ -148,7 +152,15 @@ const translations = {
     "contact.inquiryPlaceholder": "Describe your partnership, investment or project inquiry",
     "contact.submit": "Send Inquiry",
     "contact.success": "Inquiry sent successfully.",
-    "contact.error": "Failed to send inquiry. Please try again later."
+    "contact.error": "Failed to send inquiry. Please try again later.",
+    "contact.validation": "Please complete all required fields correctly.",
+    "contact.error.nameRequired": "Please enter your name.",
+    "contact.error.nameShort": "Name must contain at least 2 characters.",
+    "contact.error.companyShort": "Company name must contain at least 2 characters.",
+    "contact.error.emailRequired": "Please enter your email address.",
+    "contact.error.emailInvalid": "Please enter a valid email address.",
+    "contact.error.messageRequired": "Please enter your inquiry.",
+    "contact.error.messageShort": "Inquiry must contain at least 10 characters."
   },
   ru: {
     "meta.title": "CONSTERA Industrial Group",
@@ -291,11 +303,20 @@ const translations = {
     "contact.inquiryPlaceholder": "Опишите ваш партнерский, инвестиционный или проектный запрос",
     "contact.submit": "Отправить запрос",
     "contact.success": "Запрос успешно отправлен.",
-    "contact.error": "Не удалось отправить запрос. Попробуйте позже."
+    "contact.error": "Не удалось отправить запрос. Попробуйте позже.",
+    "contact.validation": "Пожалуйста, корректно заполните все обязательные поля.",
+    "contact.error.nameRequired": "Пожалуйста, укажите имя.",
+    "contact.error.nameShort": "Имя должно содержать не менее 2 символов.",
+    "contact.error.companyShort": "Название компании должно содержать не менее 2 символов.",
+    "contact.error.emailRequired": "Пожалуйста, укажите email.",
+    "contact.error.emailInvalid": "Пожалуйста, укажите корректный email.",
+    "contact.error.messageRequired": "Пожалуйста, укажите текст запроса.",
+    "contact.error.messageShort": "Текст запроса должен содержать не менее 10 символов."
   }
 };
 
 let currentLanguage = localStorage.getItem("constera-language") || "en";
+let languageTransitionTimers = [];
 
 const applyTranslations = (lang) => {
   const dictionary = translations[lang] || translations.en;
@@ -320,7 +341,9 @@ const applyTranslations = (lang) => {
   });
 
   if (formStatus && !formStatus.hidden && formStatus.dataset.status) {
-    const statusKey = `contact.${formStatus.dataset.status}`;
+    const statusKey = formStatus.dataset.status === "validation"
+      ? "contact.validation"
+      : `contact.${formStatus.dataset.status}`;
     if (dictionary[statusKey]) {
       formStatus.textContent = dictionary[statusKey];
     }
@@ -333,6 +356,84 @@ const applyTranslations = (lang) => {
   if (langInput) {
     langInput.value = lang;
   }
+
+  formFields.forEach((field) => {
+    if (field.dataset.errorKey) {
+      const errorNode = form?.querySelector(`[data-error-for="${field.name}"]`);
+      if (errorNode && dictionary[field.dataset.errorKey]) {
+        errorNode.textContent = dictionary[field.dataset.errorKey];
+      }
+    }
+  });
+};
+
+const setFormStatus = (type, text) => {
+  if (!formStatus) return;
+  formStatus.hidden = false;
+  formStatus.dataset.status = type;
+  formStatus.classList.remove("is-success", "is-error");
+  formStatus.classList.add(type === "success" ? "is-success" : "is-error");
+  formStatus.textContent = text;
+};
+
+const clearFormStatus = () => {
+  if (!formStatus) return;
+  formStatus.hidden = true;
+  formStatus.dataset.status = "";
+  formStatus.classList.remove("is-success", "is-error");
+  formStatus.textContent = "";
+};
+
+const setFieldError = (field, errorKey) => {
+  const wrapper = field.closest(".form-field");
+  const errorNode = form?.querySelector(`[data-error-for="${field.name}"]`);
+  const message = translations[currentLanguage][errorKey];
+
+  if (!wrapper || !errorNode || !message) return false;
+  field.dataset.errorKey = errorKey;
+  wrapper.classList.remove("has-error");
+  void wrapper.offsetWidth;
+  wrapper.classList.add("has-error");
+  errorNode.textContent = message;
+  field.setAttribute("aria-invalid", "true");
+  return false;
+};
+
+const clearFieldError = (field) => {
+  const wrapper = field.closest(".form-field");
+  const errorNode = form?.querySelector(`[data-error-for="${field.name}"]`);
+
+  if (wrapper) wrapper.classList.remove("has-error");
+  if (errorNode) errorNode.textContent = "";
+  field.removeAttribute("aria-invalid");
+  delete field.dataset.errorKey;
+};
+
+const validateField = (field) => {
+  const value = field.value.trim();
+
+  if (field.name === "name") {
+    if (!value) return setFieldError(field, "contact.error.nameRequired");
+    if (value.length < 2) return setFieldError(field, "contact.error.nameShort");
+  }
+
+  if (field.name === "company") {
+    if (value && value.length < 2) return setFieldError(field, "contact.error.companyShort");
+  }
+
+  if (field.name === "email") {
+    if (!value) return setFieldError(field, "contact.error.emailRequired");
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(value)) return setFieldError(field, "contact.error.emailInvalid");
+  }
+
+  if (field.name === "message") {
+    if (!value) return setFieldError(field, "contact.error.messageRequired");
+    if (value.length < 10) return setFieldError(field, "contact.error.messageShort");
+  }
+
+  clearFieldError(field);
+  return true;
 };
 
 const animateCounter = (entry) => {
@@ -359,13 +460,32 @@ if (menuToggle && nav) {
   menuToggle.addEventListener("click", () => {
     const isOpen = nav.classList.toggle("is-open");
     menuToggle.setAttribute("aria-expanded", String(isOpen));
+    menuToggle.classList.toggle("is-active", isOpen);
   });
 
   nav.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       nav.classList.remove("is-open");
       menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.classList.remove("is-active");
     });
+  });
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) return;
+    if (!nav.classList.contains("is-open")) return;
+    if (nav.contains(target) || menuToggle.contains(target)) return;
+    nav.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.classList.remove("is-active");
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    nav.classList.remove("is-open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    menuToggle.classList.remove("is-active");
   });
 }
 
@@ -395,9 +515,27 @@ if (window.AOS) {
 
 langButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    currentLanguage = button.dataset.lang;
-    localStorage.setItem("constera-language", currentLanguage);
-    applyTranslations(currentLanguage);
+    const nextLanguage = button.dataset.lang;
+    if (nextLanguage === currentLanguage) return;
+
+    languageTransitionTimers.forEach((timer) => window.clearTimeout(timer));
+    languageTransitionTimers = [];
+
+    if (pageTransition) {
+      pageTransition.classList.add("is-visible");
+    }
+
+    const applyTimer = window.setTimeout(() => {
+      currentLanguage = nextLanguage;
+      localStorage.setItem("constera-language", currentLanguage);
+      applyTranslations(currentLanguage);
+    }, 120);
+
+    const hideTimer = window.setTimeout(() => {
+      pageTransition?.classList.remove("is-visible");
+    }, 520);
+
+    languageTransitionTimers.push(applyTimer, hideTimer);
   });
 });
 
@@ -414,16 +552,45 @@ if (statusLang && translations[statusLang]) {
 }
 
 if (formStatus && (status === "success" || status === "error")) {
-  formStatus.hidden = false;
-  formStatus.dataset.status = status;
-  formStatus.classList.add(status === "success" ? "is-success" : "is-error");
-  formStatus.textContent = translations[currentLanguage][`contact.${status}`];
+  setFormStatus(status, translations[currentLanguage][`contact.${status}`]);
+}
+
+if (status === "validation") {
+  setFormStatus("error", translations[currentLanguage]["contact.validation"]);
 }
 
 if (form) {
-  form.addEventListener("submit", () => {
+  formFields.forEach((field) => {
+    field.addEventListener("blur", () => {
+      validateField(field);
+    });
+
+    field.addEventListener("input", () => {
+      if (field.dataset.errorKey) {
+        validateField(field);
+      }
+      if (formStatus && !formStatus.hidden && formStatus.dataset.status === "error") {
+        clearFormStatus();
+      }
+    });
+  });
+
+  form.addEventListener("submit", (event) => {
     if (langInput) {
       langInput.value = currentLanguage;
+    }
+
+    let firstInvalidField = null;
+    const isValid = formFields.every((field) => {
+      const fieldValid = validateField(field);
+      if (!fieldValid && !firstInvalidField) firstInvalidField = field;
+      return fieldValid;
+    });
+
+    if (!isValid) {
+      event.preventDefault();
+      setFormStatus("error", translations[currentLanguage]["contact.validation"]);
+      firstInvalidField?.focus();
     }
   });
 }

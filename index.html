@@ -26,6 +26,12 @@
   <body>
     <div class="ambient ambient-one"></div>
     <div class="ambient ambient-two"></div>
+    <div class="page-transition" aria-hidden="true">
+      <div class="page-transition-loader">
+        <span></span>
+        <span></span>
+      </div>
+    </div>
     <div class="site-shell">
       <header class="header">
         <a class="brand" href="#home" aria-label="CONSTERA Industrial Group home">
@@ -42,8 +48,10 @@
           aria-expanded="false"
           aria-controls="site-nav"
         >
-          <span></span>
-          <span></span>
+          <span class="menu-toggle-box">
+            <span class="menu-toggle-line"></span>
+            <span class="menu-toggle-line"></span>
+          </span>
         </button>
 
         <nav class="nav" id="site-nav">
@@ -317,12 +325,6 @@
               <span data-i18n="partners.item4">Utilities</span>
               <span data-i18n="partners.item5">Logistics Operators</span>
               <span data-i18n="partners.item6">Technology Alliances</span>
-              <span data-i18n="partners.item1">Infrastructure Funds</span>
-              <span data-i18n="partners.item2">Industrial OEMs</span>
-              <span data-i18n="partners.item3">Sovereign Entities</span>
-              <span data-i18n="partners.item4">Utilities</span>
-              <span data-i18n="partners.item5">Logistics Operators</span>
-              <span data-i18n="partners.item6">Technology Alliances</span>
             </div>
           </div>
         </section>
@@ -409,33 +411,63 @@
               class="contact-form glass"
               action="send.php"
               method="post"
+              novalidate
               data-aos="fade-up"
               data-aos-duration="1100"
               data-aos-delay="90"
             >
               <input type="hidden" name="lang" value="en" />
               <div class="form-status" hidden aria-live="polite"></div>
-              <label>
-                <span data-i18n="contact.name">Name</span>
-                <input type="text" name="name" placeholder="Your full name" data-i18n-placeholder="contact.namePlaceholder" />
+              <label class="form-field">
+                <span data-i18n="contact.name">Name</span><span class="required-mark" aria-hidden="true">*</span>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your full name"
+                  data-i18n-placeholder="contact.namePlaceholder"
+                  autocomplete="name"
+                  minlength="2"
+                  maxlength="80"
+                  required
+                />
+                <small class="field-error" data-error-for="name" aria-live="polite"></small>
               </label>
-              <label>
+              <label class="form-field">
                 <span data-i18n="contact.company">Company</span>
-                <input type="text" name="company" placeholder="Company or institution" data-i18n-placeholder="contact.companyPlaceholder" />
+                <input
+                  type="text"
+                  name="company"
+                  placeholder="Company or institution"
+                  data-i18n-placeholder="contact.companyPlaceholder"
+                  autocomplete="organization"
+                  maxlength="120"
+                />
+                <small class="field-error" data-error-for="company" aria-live="polite"></small>
               </label>
-              <label>
-                <span data-i18n="contact.email">Email</span>
-                <input type="email" name="email" placeholder="name@company.com" required />
+              <label class="form-field">
+                <span data-i18n="contact.email">Email</span><span class="required-mark" aria-hidden="true">*</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@company.com"
+                  autocomplete="email"
+                  maxlength="120"
+                  required
+                />
+                <small class="field-error" data-error-for="email" aria-live="polite"></small>
               </label>
-              <label>
-                <span data-i18n="contact.inquiry">Inquiry</span>
+              <label class="form-field">
+                <span data-i18n="contact.inquiry">Inquiry</span><span class="required-mark" aria-hidden="true">*</span>
                 <textarea
                   name="message"
                   rows="5"
                   placeholder="Describe your partnership, investment or project inquiry"
                   data-i18n-placeholder="contact.inquiryPlaceholder"
+                  minlength="10"
+                  maxlength="1200"
                   required
                 ></textarea>
+                <small class="field-error" data-error-for="message" aria-live="polite"></small>
               </label>
               <button class="button button-primary" type="submit" data-i18n="contact.submit">Send Inquiry</button>
             </form>
